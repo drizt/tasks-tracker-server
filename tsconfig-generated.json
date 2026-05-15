@@ -1,0 +1,31 @@
+{
+  "include": ["src/generated/**/*.ts"],
+  "exclude": ["node_modules"],
+
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "tsBuildInfoFile": "dist/tsconfig-generated.tsbuildinfo",
+
+    "target": "es2025",
+    "lib": ["ES2025"],
+    "module": "node20",
+    "types": ["node"],
+    "sourceMap": true,
+    "esModuleInterop": true,
+
+    "verbatimModuleSyntax": false,
+    "isolatedModules": false,
+    "isolatedDeclarations": false,
+    "declaration": true,
+    "composite": true,
+    "resolveJsonModule": true,
+    "rewriteRelativeImportExtensions": true,
+    "declarationMap": true,
+
+    "strict": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "exactOptionalPropertyTypes": true
+  }
+}
