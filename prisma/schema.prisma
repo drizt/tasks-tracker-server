@@ -6,3 +6,37 @@ generator client {
   provider = "prisma-client"
   output   = "../src/generated/prisma"
 }
+
+model TaskState {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  tasks Task[]
+}
+
+model Task {
+  id        String   @id @default(ulid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  title     String
+  stateId   Int
+
+  state       TaskState   @relation(fields: [stateId], references: [id])
+  timeEntries TimeEntry[]
+
+  @@index([createdAt])
+  @@index([updatedAt])
+  @@index([title])
+}
+
+model TimeEntry {
+  id        String    @id @default(ulid())
+  taskId    String
+  startedAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  task Task @relation(fields: [taskId], references: [id])
+
+  @@index([startedAt])
+  @@index([endedAt])
+}

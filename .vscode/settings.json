@@ -1,18 +1,33 @@
 {
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
-  "[typescript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"
-  },
-  "eslint.validate": ["typescript"],
+  "editor.tabSize": 2,
+  "editor.defaultFormatter": null,
   "editor.codeActionsOnSave": {
     "source.fixAll": "always"
   },
-  "editor.tabSize": 2,
+
+  "[json]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[typescript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  "eslint.validate": ["typescript"],
+
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
-  }
+  },
+
+  "[sql]": {
+    "editor.defaultFormatter": "cweijan.vscode-database-client2"
+  },
+
+  "database-client.capitalizeKeywordsWhenFormatting": true,
+  "database-client.escapedAllObjectName": "always"
 }
