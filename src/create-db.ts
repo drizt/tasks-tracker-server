@@ -176,6 +176,7 @@ async function main() {
     host: url.hostname,
     port: parseInt(url.port),
     database: url.pathname.replace(/^\//, ''),
+    shadowHost: shadowUrl.hostname,
     shadowDatabase: shadowUrl.pathname.replace(/^\//, ''),
   };
 
@@ -200,6 +201,10 @@ async function main() {
     );
   } else if (!dbConfig.host) {
     die('invalid db host. Check DATABASE_URL in .env');
+  } else if (dbConfig.host !== 'localhost') {
+    die('db host must be localhost. Check DATABASE_URL in .env');
+  } else if (options.dev && dbConfig.shadowHost !== 'localhost') {
+    die('shadow db host must be localhost. Check SHADOW_DATABASE_URL in .env');
   }
 
   if (!options.rootUser) {
