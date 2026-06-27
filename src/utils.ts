@@ -1,5 +1,4 @@
 import * as fs from 'fs';
-import * as os from 'os';
 import chalk from 'chalk';
 import * as path from 'path';
 
@@ -36,18 +35,21 @@ function setDotEnvOption(filename: string, key: string, value: string): void {
   value = escapeEnvValue(value);
   let lines: string[] = [];
   if (fs.existsSync(filename)) {
-    const src = fs.readFileSync(filename, 'utf8').trim();
+    let src = fs.readFileSync(filename, 'utf8');
 
-    src.replace(/\r\n?/gm, '\n');
-    lines = src.split('\n');
+    src = src.replace(/\r\n?/g, '\n');
+    if (src) {
+      lines = src.endsWith('\n')
+        ? src.slice(0, -1).split('\n')
+        : src.split('\n');
+    }
   }
 
   const lineRx =
-    /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/g;
+    /(?:^|^)\s*(?:export\s+)?([\w.-]+)(?:\s*=\s*?|:\s+?)(\s*'(?:\\'|[^'])*'|\s*"(?:\\"|[^"])*"|\s*`(?:\\`|[^`])*`|[^#\r\n]+)?\s*(?:#.*)?(?:$|$)/;
 
   const pos = lines.findIndex((val) => {
     const match = lineRx.exec(val);
-    lineRx.lastIndex = 0; // Reset regex state because /g is used
     return match?.[1] === key;
   });
 
@@ -60,7 +62,7 @@ function setDotEnvOption(filename: string, key: string, value: string): void {
     lines[pos] = changedLine;
   }
 
-  fs.writeFileSync(filename, lines.join(os.EOL).trim() + os.EOL);
+  fs.writeFileSync(filename, lines.join('\n') + '\n');
 }
 
 function setDefaultDotEnvOption(key: string, value: string): void {
