@@ -183,20 +183,20 @@ async function main() {
     die('invalid db dialect. Check DATABASE_URL in .env');
   } else if (!dbConfig.username) {
     die('invalid db username. Check DATABASE_URL in .env');
-  } else if (!dbConfig.username.match(/^[A-z0-9_]+$/)) {
+  } else if (!dbConfig.username.match(/^[A-Za-z0-9_]+$/)) {
     die(
-      'db username can contains only A-z, numbers or underscores. Check DATABASE_URL in .env',
+      'db username can contains only letters, numbers or underscores. Check DATABASE_URL in .env',
     );
-  } else if (!dbConfig.database.match(/^[A-z0-9_]+$/)) {
+  } else if (!dbConfig.database.match(/^[A-Za-z0-9_]+$/)) {
     die(
-      'db name can contains only A-z, numbers or underscores. Check DATABASE_URL in .env',
+      'db name can contains only letters, numbers or underscores. Check DATABASE_URL in .env',
     );
   } else if (
     dbConfig.password &&
-    !dbConfig.password.match(/^[A-z0-9!@#%^_+=-]{1,64}$/)
+    !dbConfig.password.match(/^[A-Za-z0-9!@#%^_+=-]{1,64}$/)
   ) {
     die(
-      'db password can contains only A-z, numbers or symbols: !@#%^_+=-. Check DATABASE_URL in .env',
+      'db password can contains only letters, numbers or symbols: !@#%^_+=-. Check DATABASE_URL in .env',
     );
   } else if (!dbConfig.host) {
     die('invalid db host. Check DATABASE_URL in .env');
