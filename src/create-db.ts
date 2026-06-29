@@ -20,18 +20,13 @@ interface Options {
 }
 
 async function askDbUrl(): Promise<string> {
-  const { db, host, port, user, password } = await prompts([
+  const host = 'localhost';
+  const { db, port, user, password } = await prompts([
     {
       type: 'text',
       name: 'db',
       initial: 'tasks_tracker',
       message: 'Enter Tasks Tracker db name',
-    },
-    {
-      type: 'text',
-      name: 'host',
-      initial: 'localhost',
-      message: 'Enter db host',
     },
     {
       type: 'number',
