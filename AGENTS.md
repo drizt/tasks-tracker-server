@@ -1,0 +1,55 @@
+# Agent Instructions
+
+## Server Project
+
+This project uses TypeScript, ESLint, Prettier, Jest, and Prisma. Treat
+`package.json`, `eslint.config.ts`, `.prettierrc`, and `.vscode/settings.json`
+as the source of truth for linting and formatting.
+
+When changing server files:
+
+- Work from this `server/` directory for server commands, matching the VS Code
+  ESLint working directory.
+- Format changed TypeScript, JavaScript, JSON, and other Prettier-supported
+  files with Prettier. The project Prettier config currently sets
+  `singleQuote: true`.
+- Run ESLint after TypeScript changes: `npm run lint`.
+- If an ESLint fix is appropriate, use the project ESLint config with
+  `npm exec eslint -- --fix <changed-files>`, then re-run `npm run lint`.
+- For changes that can affect runtime behavior, run the focused Jest test or
+  `npm test` when practical.
+- For changes that can affect emitted TypeScript or Prisma generated code, run
+  `npm run build` when practical.
+
+This emulates the Codium/VS Code setup:
+
+- `editor.formatOnSave` is enabled.
+- TypeScript, JavaScript, and JSON use the Prettier formatter.
+- ESLint validates TypeScript from this project directory.
+- Save-time fix-all is configured through `editor.codeActionsOnSave`, so mimic
+  it by running ESLint fixes explicitly when changing linted code.
+
+## Database Structure
+
+- Treat `prisma/migrations/*.sql` as the source of truth for database
+  structure.
+- Never use SQL `ENUM` columns. For finite state values, create a lookup table
+  with `id` and `name` fields, then reference it from the target table with a
+  foreign-key id field.
+- For enum-like lookup tables with predefined rows inserted during database
+  creation, use `INTEGER` for the `id` field. Values in those rows may change in
+  some cases, but the row count is constant.
+- For app-filled tables, use only `VARCHAR(191)` for the `id` field. This field
+  contains an LUUID value, giving a native way to sort quickly and avoid
+  conflicts across multiple clients.
+- Keep `prisma/schema.prisma` based on the SQL migration files, not the other
+  way around.
+- Client-side data structures must mirror the database structure defined by the
+  SQL migrations.
+
+## Equality Style
+
+- Prefer `==` and `!=` instead of `===` and `!==` when the compared values have
+  controlled or obvious types.
+- Keep `===` or `!==` only when strict equality is needed to avoid an unwanted
+  coercion or to preserve existing behavior.
