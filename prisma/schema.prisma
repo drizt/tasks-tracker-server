@@ -7,7 +7,7 @@ generator client {
   output   = "../src/generated/prisma"
 }
 
-model TaskState {
+model TaskStatus {
   id   Int    @id @default(autoincrement())
   name String @unique
 
@@ -15,18 +15,24 @@ model TaskState {
 }
 
 model Task {
-  id        String   @id @default(ulid())
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  title     String
-  stateId   Int
+  id          String    @id @default(ulid())
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  title       String
+  description String    @db.Text
+  statusId    Int
+  isArchived  Boolean   @default(false)
+  archivedAt  DateTime?
 
-  state       TaskState   @relation(fields: [stateId], references: [id])
+  status      TaskStatus  @relation(fields: [statusId], references: [id])
   timeEntries TimeEntry[]
 
   @@index([createdAt])
   @@index([updatedAt])
   @@index([title])
+  @@index([statusId])
+  @@index([isArchived])
+  @@index([archivedAt])
 }
 
 model TimeEntry {
@@ -34,9 +40,11 @@ model TimeEntry {
   taskId    String
   startedAt DateTime  @default(now())
   endedAt   DateTime?
+  note      String    @db.Text
 
-  task Task @relation(fields: [taskId], references: [id])
+  task Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
+  @@index([taskId])
   @@index([startedAt])
   @@index([endedAt])
 }
