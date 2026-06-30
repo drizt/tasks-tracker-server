@@ -25,8 +25,14 @@
   },
 
   "[sql]": {
-    "editor.defaultFormatter": "cweijan.vscode-database-client2"
+    "editor.defaultFormatter": "sqlfluff.vscode-sqlfluff"
   },
+
+  "sqlfluff.config": "${workspaceFolder}/.sqlfluff",
+  "sqlfluff.dialect": "mysql",
+  "sqlfluff.executablePath": "/usr/local/bin/sqlfluff",
+  "sqlfluff.linter.run": "off",
+  "sqlfluff.format.enabled": true,
 
   "database-client.capitalizeKeywordsWhenFormatting": true,
   "database-client.escapedAllObjectName": "always"

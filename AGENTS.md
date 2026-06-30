@@ -2,9 +2,9 @@
 
 ## Server Project
 
-This project uses TypeScript, ESLint, Prettier, Jest, and Prisma. Treat
-`package.json`, `eslint.config.ts`, `.prettierrc`, and `.vscode/settings.json`
-as the source of truth for linting and formatting.
+This project uses TypeScript, ESLint, Prettier, SQLFluff, Jest, and Prisma.
+Treat `package.json`, `eslint.config.ts`, `.prettierrc`, `.sqlfluff`, and
+`.vscode/settings.json` as the source of truth for linting and formatting.
 
 When changing server files:
 
@@ -13,7 +13,11 @@ When changing server files:
 - Format changed TypeScript, JavaScript, JSON, and other Prettier-supported
   files with Prettier. The project Prettier config currently sets
   `singleQuote: true`.
+- Format changed SQL migration files with SQLFluff: `npm run format:sql`. This
+  uses `sqlfluff fix prisma/migrations`.
 - Run ESLint after TypeScript changes: `npm run lint`.
+- Run SQLFluff after SQL migration changes: `npm run lint:sql`. This uses
+  `sqlfluff lint prisma/migrations`.
 - If an ESLint fix is appropriate, use the project ESLint config with
   `npm exec eslint -- --fix <changed-files>`, then re-run `npm run lint`.
 - For changes that can affect runtime behavior, run the focused Jest test or
@@ -25,6 +29,10 @@ This emulates the Codium/VS Code setup:
 
 - `editor.formatOnSave` is enabled.
 - TypeScript, JavaScript, and JSON use the Prettier formatter.
+- SQL uses the SQLFluff formatter with `.sqlfluff` as the shared CLI and editor
+  config.
+- SQLFluff editor diagnostics are disabled; rely on format-on-save in Codium
+  and `npm run lint:sql` in the CLI.
 - ESLint validates TypeScript from this project directory.
 - Save-time fix-all is configured through `editor.codeActionsOnSave`, so mimic
   it by running ESLint fixes explicitly when changing linted code.

@@ -29,6 +29,8 @@
     "clean": "rimraf dist src/generated",
     "compile": "tsc --build",
     "lint": "eslint",
+    "lint:sql": "sqlfluff lint prisma/migrations",
+    "format:sql": "sqlfluff fix prisma/migrations",
     "prisma:generate": "prisma generate --no-hints"
   },
   "dependencies": {

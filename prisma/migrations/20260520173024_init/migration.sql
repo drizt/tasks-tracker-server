@@ -8,12 +8,12 @@ CREATE TABLE `TaskStatus` (
 
 -- InsertInto
 INSERT INTO
-    `TaskStatus` (`name`)
+`TaskStatus` (`name`)
 VALUES ('new'),
-    ('active'),
-    ('completed'),
-    ('deferred'),
-    ('canceled');
+('active'),
+('completed'),
+('deferred'),
+('canceled');
 
 -- CreateTable
 CREATE TABLE `Task` (
@@ -49,8 +49,12 @@ CREATE TABLE `TimeEntry` (
 
 -- AddForeignKey
 ALTER TABLE `Task`
-ADD CONSTRAINT `Task_statusId_fkey` FOREIGN KEY (`statusId`) REFERENCES `TaskStatus` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
+ADD CONSTRAINT `Task_statusId_fkey` FOREIGN KEY (
+    `statusId`
+) REFERENCES `TaskStatus` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE `TimeEntry`
-ADD CONSTRAINT `TimeEntry_taskId_fkey` FOREIGN KEY (`taskId`) REFERENCES `Task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+ADD CONSTRAINT `TimeEntry_taskId_fkey` FOREIGN KEY (
+    `taskId`
+) REFERENCES `Task` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
