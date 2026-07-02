@@ -15,6 +15,8 @@ When changing server files:
   `singleQuote: true`.
 - Format Markdown description text, including commit message bodies, with
   Prettier before using it.
+- When adding a file-level header comment, leave one empty line after it before
+  imports or code.
 - Format changed SQL migration files with SQLFluff: `npm run format:sql`. This
   uses `sqlfluff fix prisma/migrations`.
 - Run ESLint after TypeScript changes: `npm run lint`.
