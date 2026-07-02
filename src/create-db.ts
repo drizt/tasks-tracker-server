@@ -1,15 +1,13 @@
-import * as fs from 'node:fs';
 import { spawn } from 'node:child_process';
 
 import { PrismaClient } from './generated/prisma/client.js';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import chalk from 'chalk';
-import dotenv from 'dotenv';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import prompts from 'prompts';
 
-import { die, setDefaultDotEnvOption } from './utils.ts';
+import { die, readDotEnvFile, setDefaultDotEnvOption } from './utils.ts';
 
 interface Options {
   force?: boolean; // recreate db
@@ -21,16 +19,6 @@ interface Options {
   url?: string;
   dev?: boolean; // developer mode
   shadowUrl?: string;
-}
-
-function readDotEnv(): Record<string, string> {
-  const filename = '.env';
-
-  if (!fs.existsSync(filename)) {
-    return {};
-  }
-
-  return dotenv.parse(fs.readFileSync(filename));
 }
 
 function getEnvOption(dotEnv: Record<string, string>, key: string): string {
@@ -161,7 +149,7 @@ Initialize db for Tasks Tracker server`,
 
 async function main() {
   const argv = await parseCommandLine();
-  const dotEnv = readDotEnv();
+  const dotEnv = readDotEnvFile();
 
   const options: Options = {};
   const dropDatabase = getEnvOption(dotEnv, 'DROP_DATABASE');

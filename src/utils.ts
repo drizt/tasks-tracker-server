@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import chalk from 'chalk';
+import dotenv from 'dotenv';
 import * as path from 'path';
 
 function die(message: string): void {
@@ -70,4 +71,13 @@ function setDefaultDotEnvOption(key: string, value: string): void {
   setDotEnvOption(filename, key, value);
 }
 
-export { die, setDotEnvOption, setDefaultDotEnvOption };
+function readDotEnvFile(filename = '.env'): Record<string, string> {
+  const dotEnvPath = path.join(process.cwd(), filename);
+  if (!fs.existsSync(dotEnvPath)) {
+    return {};
+  }
+
+  return dotenv.parse(fs.readFileSync(dotEnvPath));
+}
+
+export { die, readDotEnvFile, setDotEnvOption, setDefaultDotEnvOption };
