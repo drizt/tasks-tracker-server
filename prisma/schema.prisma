@@ -15,7 +15,7 @@ model TaskStatus {
 }
 
 model Task {
-  id          String    @id @default(ulid())
+  id          String    @id
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   title       String
@@ -36,7 +36,7 @@ model Task {
 }
 
 model TimeEntry {
-  id        String    @id @default(ulid())
+  id        String    @id
   taskId    String
   startedAt DateTime  @default(now())
   endedAt   DateTime?
