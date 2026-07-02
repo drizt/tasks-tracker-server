@@ -20,6 +20,11 @@
 
   "eslint.validate": ["typescript"],
 
+  "jest.jestCommandLine": "npm test --",
+  "jest.nodeEnv": {
+    "NODE_OPTIONS": "--experimental-vm-modules --no-warnings"
+  },
+
   "[prisma]": {
     "editor.defaultFormatter": "Prisma.prisma"
   },
