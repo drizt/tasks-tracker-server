@@ -1,6 +1,10 @@
+import * as fs from 'node:fs';
+import { spawn } from 'node:child_process';
+
 import { PrismaClient } from './generated/prisma/client.js';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import chalk from 'chalk';
+import dotenv from 'dotenv';
 import yargs from 'yargs';
 import { hideBin } from 'yargs/helpers';
 import prompts from 'prompts';
@@ -17,6 +21,20 @@ interface Options {
   url?: string;
   dev?: boolean; // developer mode
   shadowUrl?: string;
+}
+
+function readDotEnv(): Record<string, string> {
+  const filename = '.env';
+
+  if (!fs.existsSync(filename)) {
+    return {};
+  }
+
+  return dotenv.parse(fs.readFileSync(filename));
+}
+
+function getEnvOption(dotEnv: Record<string, string>, key: string): string {
+  return dotEnv[key] ?? process.env[key] ?? '';
 }
 
 async function askDbUrl(): Promise<string> {
@@ -61,6 +79,31 @@ async function askDbUrl(): Promise<string> {
   dbUrl += '/' + db;
 
   return dbUrl;
+}
+
+async function runCommand(command: string, args: string[]): Promise<void> {
+  await new Promise<void>((resolve, reject) => {
+    const child = spawn(command, args, {
+      cwd: process.cwd(),
+      stdio: 'inherit',
+    });
+
+    child.on('error', reject);
+    child.on('exit', (code) => {
+      if (code == 0) {
+        resolve();
+      } else {
+        reject(new Error(`${command} ${args.join(' ')} exited with ${code}`));
+      }
+    });
+  });
+}
+
+async function applyMigrations(): Promise<void> {
+  console.log('');
+  console.log('Applying migrations');
+
+  await runCommand('npm', ['run', 'migrate:deploy']);
 }
 
 async function askDev(): Promise<boolean> {
@@ -118,12 +161,12 @@ Initialize db for Tasks Tracker server`,
 
 async function main() {
   const argv = await parseCommandLine();
+  const dotEnv = readDotEnv();
 
   const options: Options = {};
+  const dropDatabase = getEnvOption(dotEnv, 'DROP_DATABASE');
   options.force =
-    argv.force ||
-    (!!process.env.DROP_DATABASE && process.env.DROP_DATABASE != '0') ||
-    false;
+    argv.force || (!!dropDatabase && dropDatabase != '0') || false;
 
   if (argv.dev) {
     options.dev = argv.dev;
@@ -131,21 +174,24 @@ async function main() {
 
   if (argv.rootUser) {
     options.rootUser = argv.rootUser;
-  } else if (process.env.ROOT_USER) {
-    options.rootUser = process.env.ROOT_USER;
+  } else {
+    options.rootUser = getEnvOption(dotEnv, 'ROOT_USER');
   }
 
   if (argv.rootPassword) {
     options.rootPassword = argv.rootPassword;
-  } else if (process.env.ROOT_PASSWORD) {
-    options.rootPassword = process.env.ROOT_PASSWORD;
+  } else {
+    options.rootPassword = getEnvOption(dotEnv, 'ROOT_PASSWORD');
   }
+
+  const databaseUrl = getEnvOption(dotEnv, 'DATABASE_URL');
+  const shadowDatabaseUrl = getEnvOption(dotEnv, 'SHADOW_DATABASE_URL');
 
   if (argv.url) {
     options.url = argv.url;
-  } else if (process.env.DATABASE_URL) {
-    options.url = process.env.DATABASE_URL;
-    options.dev ??= !!process.env.SHADOW_DATABASE_URL;
+  } else if (databaseUrl) {
+    options.url = databaseUrl;
+    options.dev ??= !!shadowDatabaseUrl;
   } else {
     options.url = await askDbUrl();
     options.dev = await askDev();
@@ -153,8 +199,8 @@ async function main() {
 
   let shadowUrl;
 
-  if (process.env.SHADOW_DATABASE_URL) {
-    shadowUrl = new URL(process.env.SHADOW_DATABASE_URL);
+  if (shadowDatabaseUrl) {
+    shadowUrl = new URL(shadowDatabaseUrl);
   } else {
     shadowUrl = new URL(options.url);
     shadowUrl.pathname = shadowUrl.pathname + '_shadow';
@@ -308,6 +354,12 @@ async function main() {
 
   if (!('DROP_DATABASE' in process.env)) {
     console.log('You can manually add DROP_DATABASE=1 to the .env file.');
+  }
+
+  try {
+    await applyMigrations();
+  } catch (err) {
+    die(err instanceof Error ? err.message.trim() : String(err));
   }
 }
 

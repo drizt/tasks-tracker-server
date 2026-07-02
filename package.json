@@ -31,6 +31,7 @@
     "lint": "eslint",
     "lint:sql": "sqlfluff lint prisma/migrations",
     "format:sql": "sqlfluff fix prisma/migrations",
+    "migrate:deploy": "prisma migrate deploy",
     "check:schema": "prisma migrate diff --from-migrations prisma/migrations --to-schema prisma/schema.prisma --exit-code",
     "prisma:generate": "prisma generate --no-hints"
   },
@@ -40,6 +41,7 @@
     "ajv": "^8.20.0",
     "audic": "^3.0.2",
     "chalk": "^5.6.2",
+    "dotenv": "^17.4.2",
     "prompts": "^2.4.2",
     "yargs": "^18.0.0"
   }

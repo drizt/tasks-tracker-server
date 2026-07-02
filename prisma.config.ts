@@ -1,11 +1,16 @@
 /// <reference types="node" />
 
-import 'dotenv/config';
+import * as fs from 'node:fs';
+
+import dotenv from 'dotenv';
 import { defineConfig } from 'prisma/config';
 
 const defaultDatabaseUrl = 'mysql://taskstracker@localhost/tasks_tracker';
 const defaultDatabaseShadowUrl =
   'mysql://taskstracker@localhost/tasks_tracker_shadow';
+const dotEnv = fs.existsSync('.env')
+  ? dotenv.parse(fs.readFileSync('.env'))
+  : {};
 
 export default defineConfig({
   schema: './prisma/schema.prisma',
@@ -13,8 +18,10 @@ export default defineConfig({
     path: 'prisma/migrations',
   },
   datasource: {
-    url: process.env.DATABASE_URL || defaultDatabaseUrl,
+    url: dotEnv.DATABASE_URL || process.env.DATABASE_URL || defaultDatabaseUrl,
     shadowDatabaseUrl:
-      process.env.SHADOW_DATABASE_URL || defaultDatabaseShadowUrl,
+      dotEnv.SHADOW_DATABASE_URL ||
+      process.env.SHADOW_DATABASE_URL ||
+      defaultDatabaseShadowUrl,
   },
 });
