@@ -1,6 +1,6 @@
 import { spawn } from 'node:child_process';
 
-import { PrismaClient } from './generated/prisma/client.js';
+import { PrismaClient } from './generated/prisma/client.ts';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import chalk from 'chalk';
 import yargs from 'yargs';
