@@ -2,10 +2,21 @@
 
 import { createDefaultEsmPreset } from 'ts-jest';
 
+const preset = createDefaultEsmPreset();
+
 const config = {
-  ...createDefaultEsmPreset(),
-  moduleNameMapper: {
-    '^\\.\\./src/(.*)\\.js$': '<rootDir>/src/$1.ts',
+  ...preset,
+  transform: {
+    '^.+\\.m?tsx?$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: {
+          allowImportingTsExtensions: true,
+          rewriteRelativeImportExtensions: false,
+        },
+      },
+    ],
   },
 };
 
