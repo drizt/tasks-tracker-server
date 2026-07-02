@@ -7,6 +7,7 @@
     "@types/jest": "^30.0.0",
     "@types/node": "^25.7.0",
     "@types/prompts": "^2.4.9",
+    "@types/ws": "^8.18.1",
     "@types/yargs": "^17.0.35",
     "eslint": "^10.3.0",
     "eslint-config-prettier": "^10.1.8",
@@ -36,12 +37,17 @@
     "prisma:generate": "prisma generate --no-hints"
   },
   "dependencies": {
+    "@fastify/cors": "^11.2.0",
+    "@fastify/helmet": "^13.0.2",
+    "@fastify/websocket": "^11.2.0",
     "@prisma/adapter-mariadb": "^7.8.0",
     "@prisma/client": "^7.8.0",
     "ajv": "^8.20.0",
     "audic": "^3.0.2",
     "chalk": "^5.6.2",
     "dotenv": "^17.4.2",
+    "fastify": "^5.9.0",
+    "json-rpc-2.0": "^1.7.1",
     "prompts": "^2.4.2",
     "yargs": "^18.0.0"
   }
