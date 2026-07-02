@@ -13,6 +13,8 @@ When changing server files:
 - Format changed TypeScript, JavaScript, JSON, and other Prettier-supported
   files with Prettier. The project Prettier config currently sets
   `singleQuote: true`.
+- Format Markdown description text, including commit message bodies, with
+  Prettier before using it.
 - Format changed SQL migration files with SQLFluff: `npm run format:sql`. This
   uses `sqlfluff fix prisma/migrations`.
 - Run ESLint after TypeScript changes: `npm run lint`.
