@@ -58,6 +58,17 @@ This emulates the Codium/VS Code setup:
   way around.
 - Client-side data structures must mirror the database structure defined by the
   SQL migrations.
+- The client can work without a server connection and synchronize later, so API
+  contracts must let the client define all app-created record fields needed for
+  offline creation.
+
+## JSON-RPC Contract
+
+- JSON-RPC `params` and successful `result` values must always be objects. Use
+  an empty object when no fields are needed.
+- Never use an array, string, number, boolean, or `null` as the top-level
+  `params` or successful `result` value. Arrays are allowed only inside an
+  object field.
 
 ## Equality Style
 
