@@ -8,8 +8,8 @@ Treat `package.json`, `eslint.config.ts`, `.prettierrc`, `.sqlfluff`, and
 
 When changing server files:
 
-- Work from this `server/` directory for server commands, matching the VS Code
-  ESLint working directory.
+- Work from this `tasks-tracker-server/` directory for server commands,
+  matching the VS Code ESLint working directory.
 - Format changed TypeScript, JavaScript, JSON, and other Prettier-supported
   files with Prettier. The project Prettier config currently sets
   `singleQuote: true`.
