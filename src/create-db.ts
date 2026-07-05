@@ -22,8 +22,32 @@ interface Options {
   shadowUrl?: string;
 }
 
+interface SqlStatement {
+  sql: string;
+  alreadyExistsCode?: string;
+  alreadyExistsMessage?: string;
+}
+
 function getEnvOption(dotEnv: Record<string, string>, key: string): string {
   return dotEnv[key] ?? process.env[key] ?? '';
+}
+
+function getErrorMessage(err: unknown): string {
+  return err instanceof Error ? err.message.trim() : String(err);
+}
+
+function getSqlErrorMessage(err: unknown, statement: SqlStatement): string {
+  const message = getErrorMessage(err);
+
+  if (
+    statement.alreadyExistsCode &&
+    statement.alreadyExistsMessage &&
+    message.includes('Code: `' + statement.alreadyExistsCode + '`')
+  ) {
+    return statement.alreadyExistsMessage + '\n\n' + message;
+  }
+
+  return message;
 }
 
 async function askDbUrl(): Promise<string> {
@@ -270,38 +294,66 @@ async function main() {
   const coding = 'utf8mb4';
   const collation = 'utf8mb4_unicode_ci';
 
-  let sqlLines: string[];
+  let sqlLines: SqlStatement[];
 
   if (options.force) {
     sqlLines = [
-      `CREATE OR REPLACE DATABASE \`${dbConfig.database}\` CHARACTER SET ${coding} COLLATE ${collation}`,
-      `DROP USER IF EXISTS '${dbConfig.username}'@'localhost'`,
-      `CREATE USER '${dbConfig.username}'@'localhost' IDENTIFIED BY '${dbConfig.password}'`,
-      `GRANT ALL PRIVILEGES ON  \`${dbConfig.database}\`.* TO '${dbConfig.username}'@'localhost'`,
-      `FLUSH PRIVILEGES`,
+      {
+        sql: `CREATE OR REPLACE DATABASE \`${dbConfig.database}\` CHARACTER SET ${coding} COLLATE ${collation}`,
+      },
+      {
+        sql: `DROP USER IF EXISTS '${dbConfig.username}'@'localhost'`,
+      },
+      {
+        sql: `CREATE USER '${dbConfig.username}'@'localhost' IDENTIFIED BY '${dbConfig.password}'`,
+      },
+      {
+        sql: `GRANT ALL PRIVILEGES ON  \`${dbConfig.database}\`.* TO '${dbConfig.username}'@'localhost'`,
+      },
+      { sql: `FLUSH PRIVILEGES` },
     ];
   } else {
     sqlLines = [
-      `CREATE DATABASE \`${dbConfig.database}\` CHARACTER SET ${coding} COLLATE ${collation}`,
-      `CREATE USER '${dbConfig.username}'@'localhost' IDENTIFIED BY '${dbConfig.password}'`,
-      `GRANT ALL PRIVILEGES ON  \`${dbConfig.database}\`.* TO '${dbConfig.username}'@'localhost'`,
-      `FLUSH PRIVILEGES`,
+      {
+        sql: `CREATE DATABASE \`${dbConfig.database}\` CHARACTER SET ${coding} COLLATE ${collation}`,
+        alreadyExistsCode: '1007',
+        alreadyExistsMessage:
+          'Database ' +
+          chalk.bold(dbConfig.database) +
+          ' already exists. Non-force setup expects both the database and user to be absent. Run with --force, set DROP_DATABASE=1, or choose another database name.',
+      },
+      {
+        sql: `CREATE USER '${dbConfig.username}'@'localhost' IDENTIFIED BY '${dbConfig.password}'`,
+        alreadyExistsCode: '1396',
+        alreadyExistsMessage:
+          'Database user ' +
+          chalk.bold(dbConfig.username + '@localhost') +
+          ' already exists. Non-force setup expects both the database and user to be absent. Run with --force, set DROP_DATABASE=1, remove the user, or choose another database username.',
+      },
+      {
+        sql: `GRANT ALL PRIVILEGES ON  \`${dbConfig.database}\`.* TO '${dbConfig.username}'@'localhost'`,
+      },
+      { sql: `FLUSH PRIVILEGES` },
     ];
   }
 
   if (options.dev) {
     sqlLines = [
       ...sqlLines,
-      `CREATE OR REPLACE DATABASE \`${dbConfig.shadowDatabase}\` CHARACTER SET ${coding} COLLATE ${collation}`,
-      `GRANT ALL PRIVILEGES ON  \`${dbConfig.shadowDatabase}\`.* TO '${dbConfig.username}'@'localhost'`,
+      {
+        sql: `CREATE OR REPLACE DATABASE \`${dbConfig.shadowDatabase}\` CHARACTER SET ${coding} COLLATE ${collation}`,
+      },
+      {
+        sql: `GRANT ALL PRIVILEGES ON  \`${dbConfig.shadowDatabase}\`.* TO '${dbConfig.username}'@'localhost'`,
+      },
     ];
   }
 
-  for (const sql of sqlLines) {
+  for (const statement of sqlLines) {
     try {
-      await prisma.$executeRawUnsafe(sql);
+      await prisma.$executeRawUnsafe(statement.sql);
     } catch (err) {
-      die(err instanceof Error ? err.message.trim() : String(err));
+      die(getSqlErrorMessage(err, statement));
     }
   }
 
@@ -331,7 +383,7 @@ async function main() {
   try {
     await applyMigrations();
   } catch (err) {
-    die(err instanceof Error ? err.message.trim() : String(err));
+    die(getErrorMessage(err));
   }
 }
 
