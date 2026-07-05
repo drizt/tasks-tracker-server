@@ -6,7 +6,10 @@ import * as path from 'path';
 import { setDotEnvOption } from '../src/utils.ts';
 
 function tempFile(): string {
-  return path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'tasks-tracker-')), '.env');
+  return path.join(
+    fs.mkdtempSync(path.join(os.tmpdir(), 'tasks-tracker-server-')),
+    '.env',
+  );
 }
 
 describe('setDotEnvOption', () => {

@@ -36,7 +36,9 @@ describe('readConfigInput', () => {
   it('reads .env and command line values without parameters', async () => {
     const oldArgv = process.argv;
     const oldCwd = process.cwd();
-    const cwd = mkdtempSync(path.join(tmpdir(), 'tasks-tracker-config-'));
+    const cwd = mkdtempSync(
+      path.join(tmpdir(), 'tasks-tracker-server-config-'),
+    );
 
     try {
       writeFileSync(

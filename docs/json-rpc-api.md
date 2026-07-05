@@ -130,7 +130,7 @@ Result:
 
 ```json
 {
-  "serverName": "tasks-tracker",
+  "serverName": "tasks-tracker-server",
   "protocolVersion": 1
 }
 ```

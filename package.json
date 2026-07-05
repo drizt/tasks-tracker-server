@@ -1,5 +1,5 @@
 {
-  "name": "tasks-tracker",
+  "name": "tasks-tracker-server",
   "main": "dist/index.js",
   "type": "module",
   "devDependencies": {

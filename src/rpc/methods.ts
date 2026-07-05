@@ -141,7 +141,7 @@ function registerServerMethods(
     connection.clientId = helloParams.clientId;
 
     return {
-      serverName: 'tasks-tracker',
+      serverName: 'tasks-tracker-server',
       protocolVersion: 1,
     };
   });
