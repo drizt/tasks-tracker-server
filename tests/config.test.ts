@@ -5,6 +5,18 @@ import path from 'node:path';
 
 import { readConfigInput, readServerConfig } from '../src/config.ts';
 
+const envKeys = ['HOST', 'PORT', 'DATABASE_URL', 'CORS_ORIGIN'];
+
+function restoreEnv(originalEnv: Map<string, string | undefined>): void {
+  for (const [key, value] of originalEnv) {
+    if (value == undefined) {
+      delete process.env[key];
+    } else {
+      process.env[key] = value;
+    }
+  }
+}
+
 describe('readServerConfig', () => {
   it('uses defaults without reading process env', () => {
     expect(readServerConfig()).toEqual({
@@ -36,11 +48,17 @@ describe('readConfigInput', () => {
   it('reads .env and command line values without parameters', async () => {
     const oldArgv = process.argv;
     const oldCwd = process.cwd();
+    const oldEnv = new Map(envKeys.map((key) => [key, process.env[key]]));
     const cwd = mkdtempSync(
       path.join(tmpdir(), 'tasks-tracker-server-config-'),
     );
 
     try {
+      process.env.HOST = '0.0.0.0';
+      process.env.PORT = '5001';
+      process.env.DATABASE_URL = 'mysql://process@localhost/process_db';
+      process.env.CORS_ORIGIN = 'http://process.example';
+
       writeFileSync(
         path.join(cwd, '.env'),
         [
@@ -71,6 +89,38 @@ describe('readConfigInput', () => {
     } finally {
       process.argv = oldArgv;
       process.chdir(oldCwd);
+      restoreEnv(oldEnv);
+      rmSync(cwd, { recursive: true, force: true });
+    }
+  });
+
+  it('reads process env when .env is absent', async () => {
+    const oldArgv = process.argv;
+    const oldCwd = process.cwd();
+    const oldEnv = new Map(envKeys.map((key) => [key, process.env[key]]));
+    const cwd = mkdtempSync(
+      path.join(tmpdir(), 'tasks-tracker-server-config-'),
+    );
+
+    try {
+      process.env.HOST = '0.0.0.0';
+      process.env.PORT = '5001';
+      process.env.DATABASE_URL = 'mysql://process@localhost/process_db';
+      process.env.CORS_ORIGIN = 'http://process.example';
+
+      process.chdir(cwd);
+      process.argv = ['node', 'dist/index.js'];
+
+      await expect(readConfigInput()).resolves.toEqual({
+        host: '0.0.0.0',
+        port: '5001',
+        databaseUrl: 'mysql://process@localhost/process_db',
+        corsOrigin: 'http://process.example',
+      });
+    } finally {
+      process.argv = oldArgv;
+      process.chdir(oldCwd);
+      restoreEnv(oldEnv);
       rmSync(cwd, { recursive: true, force: true });
     }
   });

@@ -19,7 +19,7 @@ interface ServerConfigInput {
 
 async function parseCommandLine() {
   const cmdLine = yargs(hideBin(process.argv))
-    .scriptName('npm start --')
+    .scriptName('tasks-tracker-server')
     .usage(
       `Usage: $0 [options]
 
@@ -57,10 +57,12 @@ async function readConfigInput(): Promise<ServerConfigInput> {
   const argv = await parseCommandLine();
 
   return {
-    host: argv.host ?? dotEnv.HOST,
-    port: argv.port ?? dotEnv.PORT,
-    databaseUrl: argv['database-url'] ?? dotEnv.DATABASE_URL,
-    corsOrigin: argv['cors-origin'] ?? dotEnv.CORS_ORIGIN,
+    host: argv.host ?? dotEnv.HOST ?? process.env.HOST,
+    port: argv.port ?? dotEnv.PORT ?? process.env.PORT,
+    databaseUrl:
+      argv['database-url'] ?? dotEnv.DATABASE_URL ?? process.env.DATABASE_URL,
+    corsOrigin:
+      argv['cors-origin'] ?? dotEnv.CORS_ORIGIN ?? process.env.CORS_ORIGIN,
   };
 }
 

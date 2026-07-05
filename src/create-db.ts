@@ -1,4 +1,4 @@
-import { spawn } from 'node:child_process';
+#!/usr/bin/env node
 
 import { PrismaClient } from './generated/prisma/client.ts';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
@@ -8,6 +8,7 @@ import { hideBin } from 'yargs/helpers';
 import prompts from 'prompts';
 
 import { die, readDotEnvFile, setDefaultDotEnvOption } from './utils.ts';
+import { runPrisma } from './prisma-cli.ts';
 
 interface Options {
   force?: boolean; // recreate db
@@ -69,29 +70,11 @@ async function askDbUrl(): Promise<string> {
   return dbUrl;
 }
 
-async function runCommand(command: string, args: string[]): Promise<void> {
-  await new Promise<void>((resolve, reject) => {
-    const child = spawn(command, args, {
-      cwd: process.cwd(),
-      stdio: 'inherit',
-    });
-
-    child.on('error', reject);
-    child.on('exit', (code) => {
-      if (code == 0) {
-        resolve();
-      } else {
-        reject(new Error(`${command} ${args.join(' ')} exited with ${code}`));
-      }
-    });
-  });
-}
-
 async function applyMigrations(): Promise<void> {
   console.log('');
   console.log('Applying migrations');
 
-  await runCommand('npm', ['run', 'migrate:deploy']);
+  await runPrisma(['migrate', 'deploy']);
 }
 
 async function askDev(): Promise<boolean> {
@@ -107,8 +90,9 @@ async function askDev(): Promise<boolean> {
 
 async function parseCommandLine() {
   const cmdLine = yargs(hideBin(process.argv))
+    .scriptName('tasks-tracker-server-create-db')
     .usage(
-      `Usage: node $0 [options]
+      `Usage: $0 [options]
 
 Initialize db for Tasks Tracker server`,
     )
@@ -131,7 +115,7 @@ Initialize db for Tasks Tracker server`,
       },
       url: {
         type: 'string',
-        decribe: 'Tasks Tracker db url',
+        describe: 'Tasks Tracker db url',
       },
       dev: {
         type: 'boolean',

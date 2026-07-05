@@ -1,0 +1,25 @@
+[Unit]
+Description=Tasks Tracker Server
+After=network.target mariadb.service
+Wants=mariadb.service
+
+[Service]
+Type=simple
+User=tasks-tracker
+Group=tasks-tracker
+WorkingDirectory=/var/lib/tasks-tracker-server
+Environment=NODE_ENV=production
+Environment=PATH=/usr/local/bin:/usr/bin:/bin
+EnvironmentFile=/etc/tasks-tracker-server/server.env
+ExecStart=/usr/bin/env tasks-tracker-server
+Restart=on-failure
+RestartSec=5
+StateDirectory=tasks-tracker-server
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/tasks-tracker-server
+
+[Install]
+WantedBy=multi-user.target

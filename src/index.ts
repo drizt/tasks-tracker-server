@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 import { readConfigInput, readServerConfig } from './config.ts';
 import { createPrismaClient } from './db/prisma.ts';
 import { createApp } from './server.ts';
