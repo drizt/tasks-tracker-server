@@ -2,7 +2,33 @@
 
 JSON-RPC server for Tasks Tracker.
 
-## Installable Package
+## Linux systemd install
+
+Install from the repository checkout:
+
+```bash
+deploy/install.sh
+```
+
+The installer builds the npm package, installs it globally, creates the
+`tasks-tracker` system user, installs the systemd unit, and starts the service.
+
+On the first install, it runs `tasks-tracker-server-create-db` as the service
+user from `/var/lib/tasks-tracker-server`. The command asks for the database URL
+and root database credentials, writes `.env` in the service working directory,
+copies it to `/etc/tasks-tracker-server/server.env`, and applies migrations. On
+later runs, when that config already exists, the installer runs
+`tasks-tracker-server-migrate` instead.
+
+Useful options:
+
+```bash
+deploy/install.sh --no-deps
+deploy/install.sh --skip-db
+deploy/install.sh --create-db
+```
+
+## Installable package
 
 Build and pack the server:
 
@@ -29,13 +55,13 @@ tasks-tracker-server-migrate
 ## Configuration
 
 For local development, the server reads `.env` from the current working
-directory. For systemd deployments, use an environment file:
+directory. The systemd service reads its deployment configuration from:
 
 ```text
 /etc/tasks-tracker-server/server.env
 ```
 
-Example:
+Example values:
 
 ```env
 HOST=127.0.0.1
@@ -46,51 +72,9 @@ CORS_ORIGIN=http://localhost:3000
 
 Command-line options override `.env` and process environment values.
 
-## Database
-
-Create the service user and directories:
-
-```bash
-sudo useradd --system \
-  --home-dir /var/lib/tasks-tracker-server \
-  --shell /usr/sbin/nologin \
-  tasks-tracker
-sudo install -d -m 0750 -o tasks-tracker -g tasks-tracker \
-  /var/lib/tasks-tracker-server
-sudo install -d -m 0750 -o root -g tasks-tracker \
-  /etc/tasks-tracker-server
-sudo install -m 0640 -o root -g tasks-tracker deploy/server.env.example \
-  /etc/tasks-tracker-server/server.env
-```
-
-Create the database and user when setting up a new machine:
-
-```bash
-sudo -u tasks-tracker bash -lc \
-  'set -a; . /etc/tasks-tracker-server/server.env; set +a; \
-   cd /var/lib/tasks-tracker-server; tasks-tracker-server-create-db'
-```
-
-Apply migrations after package upgrades:
-
-```bash
-sudo -u tasks-tracker bash -lc \
-  'set -a; . /etc/tasks-tracker-server/server.env; set +a; \
-   cd /var/lib/tasks-tracker-server; tasks-tracker-server-migrate'
-```
-
 ## systemd
 
-Install the example unit:
-
-```bash
-sudo install -D -m 0644 deploy/tasks-tracker-server.service \
-  /etc/systemd/system/tasks-tracker-server.service
-sudo systemctl daemon-reload
-sudo systemctl enable --now tasks-tracker-server
-```
-
-Check logs:
+The installer enables and restarts the service automatically. Check logs:
 
 ```bash
 journalctl -u tasks-tracker-server -f
