@@ -81,6 +81,7 @@ tasks.create params must be an object
 - `description` can be an empty string.
 - `note` can be an empty string.
 - `statusId` is a finite number.
+- `archivedAt` can be `null` to clear the archived timestamp.
 
 ## Records
 
@@ -195,7 +196,8 @@ Result:
 ### `tasks.update`
 
 Updates task fields. The client must provide the task ID. Other fields are
-optional.
+optional. Send `isArchived: false` and `archivedAt: null` to unarchive a task
+and clear the archived timestamp.
 
 Params:
 
@@ -204,7 +206,9 @@ Params:
   "id": "task-ulid",
   "title": "Write better docs",
   "description": "",
-  "statusId": 1
+  "statusId": 1,
+  "isArchived": false,
+  "archivedAt": null
 }
 ```
 
