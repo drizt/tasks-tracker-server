@@ -52,7 +52,7 @@ This emulates the Codium/VS Code setup:
   creation, use `INTEGER` for the `id` field. Values in those rows may change in
   some cases, but the row count is constant.
 - For app-filled tables, use only `VARCHAR(191)` for the `id` field. This field
-  contains an LUUID value, giving a native way to sort quickly and avoid
+  contains a ULID value, giving a native way to sort quickly and avoid
   conflicts across multiple clients.
 - Keep `prisma/schema.prisma` based on the SQL migration files, not the other
   way around.
