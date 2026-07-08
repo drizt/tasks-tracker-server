@@ -393,6 +393,41 @@ describe('RPC task methods', () => {
     });
   });
 
+  it('updates archived state when unarchiving tasks', async () => {
+    const socket = new FakeSocket();
+    const tasks = repository();
+    const connection = new RpcConnection(socket as unknown as WebSocket);
+    registerServerMethods(connection, tasks);
+
+    await connection.receive(
+      JSON.stringify({
+        jsonrpc: '2.0',
+        id: 'rpc-update-unarchive',
+        method: 'tasks.update',
+        params: {
+          id: 'client-luuid-1',
+          statusId: 1,
+          isArchived: false,
+          archivedAt: null,
+        },
+      }),
+    );
+
+    expect(tasks.updated).toEqual([
+      {
+        id: 'client-luuid-1',
+        statusId: 1,
+        isArchived: false,
+        archivedAt: null,
+      },
+    ]);
+    expect(socket.sent).toContainEqual({
+      jsonrpc: '2.0',
+      id: 'rpc-update-unarchive',
+      result: {},
+    });
+  });
+
   it('deletes tasks and emits a deleted task event', async () => {
     const socket = new FakeSocket();
     const tasks = repository();

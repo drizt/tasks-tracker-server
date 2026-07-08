@@ -97,6 +97,8 @@ const taskUpdateParamsSchema = z.object({
   title: nonEmptyString().optional(),
   description: z.string().optional(),
   statusId: finiteNumber().optional(),
+  isArchived: z.boolean().optional(),
+  archivedAt: dateString().nullable().optional(),
 });
 
 const taskArchiveParamsSchema = z.object({
@@ -268,6 +270,15 @@ function readTaskUpdateParams(params: unknown): TaskUpdateParams {
     }),
     ...(updateParams.statusId != undefined && {
       statusId: updateParams.statusId,
+    }),
+    ...(updateParams.isArchived != undefined && {
+      isArchived: updateParams.isArchived,
+    }),
+    ...(updateParams.archivedAt !== undefined && {
+      archivedAt:
+        updateParams.archivedAt == null
+          ? null
+          : new Date(updateParams.archivedAt),
     }),
   };
 }

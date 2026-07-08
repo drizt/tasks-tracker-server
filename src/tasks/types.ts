@@ -31,6 +31,8 @@ interface TaskUpdateParams {
   title?: string;
   description?: string;
   statusId?: number;
+  isArchived?: boolean;
+  archivedAt?: Date | null;
 }
 
 interface TaskArchiveParams {

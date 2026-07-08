@@ -49,7 +49,10 @@ class PrismaTaskRepository implements TaskRepository {
 
   async update(params: TaskUpdateParams): Promise<TaskRecord> {
     const data: Partial<
-      Pick<TaskRecord, 'title' | 'description' | 'statusId'>
+      Pick<
+        TaskRecord,
+        'title' | 'description' | 'statusId' | 'isArchived' | 'archivedAt'
+      >
     > = {};
 
     if (params.title != undefined) {
@@ -62,6 +65,14 @@ class PrismaTaskRepository implements TaskRepository {
 
     if (params.statusId != undefined) {
       data.statusId = params.statusId;
+    }
+
+    if (params.isArchived != undefined) {
+      data.isArchived = params.isArchived;
+    }
+
+    if (params.archivedAt !== undefined) {
+      data.archivedAt = params.archivedAt;
     }
 
     return await this.prisma.task.update({
