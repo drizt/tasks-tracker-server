@@ -30,7 +30,7 @@ function task(overrides: Partial<TaskRecord> = {}): TaskRecord {
   const now = new Date('2026-06-30T00:00:00.000Z');
 
   return {
-    id: 'task-client-luuid',
+    id: 'task-client-ulid',
     createdAt: now,
     updatedAt: now,
     title: 'Task',
@@ -202,7 +202,7 @@ describe('RPC task methods', () => {
         id: 'rpc-1',
         method: 'tasks.create',
         params: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
           createdAt: '2026-06-30T00:00:00.000Z',
           updatedAt: '2026-06-30T00:30:00.000Z',
           title: 'Write RPC server',
@@ -216,7 +216,7 @@ describe('RPC task methods', () => {
 
     expect(tasks.created).toEqual([
       {
-        id: 'client-luuid-1',
+        id: 'client-ulid-1',
         createdAt: new Date('2026-06-30T00:00:00.000Z'),
         updatedAt: new Date('2026-06-30T00:30:00.000Z'),
         title: 'Write RPC server',
@@ -231,7 +231,7 @@ describe('RPC task methods', () => {
       method: 'tasks.changed',
       params: {
         task: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
           createdAt: '2026-06-30T00:00:00.000Z',
           updatedAt: '2026-06-30T00:30:00.000Z',
           title: 'Write RPC server',
@@ -267,7 +267,7 @@ describe('RPC task methods', () => {
         id: 'rpc-broadcast-task-create',
         method: 'tasks.create',
         params: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
           createdAt: '2026-06-30T00:00:00.000Z',
           updatedAt: '2026-06-30T00:30:00.000Z',
           title: 'Write RPC server',
@@ -284,7 +284,7 @@ describe('RPC task methods', () => {
       method: 'tasks.changed',
       params: {
         task: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
           createdAt: '2026-06-30T00:00:00.000Z',
           updatedAt: '2026-06-30T00:30:00.000Z',
           title: 'Write RPC server',
@@ -374,7 +374,7 @@ describe('RPC task methods', () => {
         id: 'rpc-update-empty-description',
         method: 'tasks.update',
         params: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
           description: '',
         },
       }),
@@ -382,7 +382,7 @@ describe('RPC task methods', () => {
 
     expect(tasks.updated).toEqual([
       {
-        id: 'client-luuid-1',
+        id: 'client-ulid-1',
         description: '',
       },
     ]);
@@ -405,7 +405,7 @@ describe('RPC task methods', () => {
         id: 'rpc-update-unarchive',
         method: 'tasks.update',
         params: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
           statusId: 1,
           isArchived: false,
           archivedAt: null,
@@ -415,7 +415,7 @@ describe('RPC task methods', () => {
 
     expect(tasks.updated).toEqual([
       {
-        id: 'client-luuid-1',
+        id: 'client-ulid-1',
         statusId: 1,
         isArchived: false,
         archivedAt: null,
@@ -440,21 +440,21 @@ describe('RPC task methods', () => {
         id: 'rpc-delete-task',
         method: 'tasks.delete',
         params: {
-          id: 'client-luuid-1',
+          id: 'client-ulid-1',
         },
       }),
     );
 
     expect(tasks.deleted).toEqual([
       {
-        id: 'client-luuid-1',
+        id: 'client-ulid-1',
       },
     ]);
     expect(socket.sent).toContainEqual({
       jsonrpc: '2.0',
       method: 'tasks.changed',
       params: {
-        task: serializedTask(task({ id: 'client-luuid-1' })),
+        task: serializedTask(task({ id: 'client-ulid-1' })),
         operation: 'deleted',
       },
     });
@@ -498,7 +498,7 @@ describe('RPC task methods', () => {
   it('can call client methods over the same RPC connection', async () => {
     const socket = new FakeSocket();
     const connection = new RpcConnection(socket as unknown as WebSocket);
-    const changedTask = task({ id: 'client-luuid-1' });
+    const changedTask = task({ id: 'client-ulid-1' });
 
     const pendingRequest = Promise.resolve(
       connection.request('sync.applyChanges', {
